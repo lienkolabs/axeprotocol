@@ -1,0 +1,6 @@
+{
+    "BlockServiceAddress" : "localhost:3001",
+	"BlockServiceToken": "",
+    "BlockBoardcastPort" : 4001,
+	"StateDataPath" : "./"
+}
