@@ -20,6 +20,34 @@ type ActionValidator interface {
 	SetNewRevokePower(crypto.Hash) bool
 }
 
+func GetTokens(data []byte) []crypto.Token {
+	kind := Kind(data)
+	switch kind {
+	case JoinNetworkType:
+		if join := ParseJoinNetwork(data); join != nil {
+			return join.Tokens()
+		}
+
+	case UpdateInfoType:
+		if update := ParseUpdateInfo(data); update != nil {
+			return update.Tokens()
+		}
+	case GrantPowerOfAttorneyType:
+		if grant := ParseGrantPowerOfAttorney(data); grant != nil {
+			return grant.Tokens()
+		}
+	case RevokePowerOfAttorneyType:
+		if revoke := ParseRevokePowerOfAttorney(data); revoke != nil {
+			return revoke.Tokens()
+		}
+	case VoidType:
+		if void := ParseVoid(data); void != nil {
+			return void.Tokens()
+		}
+	}
+	return nil
+}
+
 const (
 	VoidType byte = iota
 	JoinNetworkType
@@ -48,6 +76,10 @@ type JoinNetwork struct {
 	Handle    string
 	Details   string
 	Signature crypto.Signature
+}
+
+func (j *JoinNetwork) Tokens() []crypto.Token {
+	return []crypto.Token{j.Author}
 }
 
 func (j *JoinNetwork) Validate(v ActionValidator) bool {
@@ -117,6 +149,14 @@ type UpdateInfo struct {
 	Signature crypto.Signature
 }
 
+func (u *UpdateInfo) Tokens() []crypto.Token {
+	if u.Signer.Equal(u.Author) {
+		return []crypto.Token{u.Author}
+	} else {
+		return []crypto.Token{u.Author, u.Signer}
+	}
+}
+
 func (u *UpdateInfo) Validate(v ActionValidator) bool {
 	if !v.HasMember(crypto.HashToken(u.Author)) {
 		return false
@@ -180,6 +220,10 @@ type GrantPowerOfAttorney struct {
 	Signature crypto.Signature
 }
 
+func (g *GrantPowerOfAttorney) Tokens() []crypto.Token {
+	return []crypto.Token{g.Author, g.Attorney}
+}
+
 func (g *GrantPowerOfAttorney) Validate(v ActionValidator) bool {
 	if !v.HasMember(crypto.HashToken(g.Author)) {
 		return false
@@ -234,6 +278,10 @@ type RevokePowerOfAttorney struct {
 	Author    crypto.Token
 	Attorney  crypto.Token
 	Signature crypto.Signature
+}
+
+func (r *RevokePowerOfAttorney) Tokens() []crypto.Token {
+	return []crypto.Token{r.Author, r.Attorney}
 }
 
 func (r *RevokePowerOfAttorney) Validate(v ActionValidator) bool {
@@ -291,6 +339,14 @@ type Void struct {
 	Data      []byte
 	Signer    crypto.Token
 	Signature crypto.Signature
+}
+
+func (g *Void) Tokens() []crypto.Token {
+	if g.Author.Equal(g.Signer) {
+		return []crypto.Token{g.Author}
+	} else {
+		return []crypto.Token{g.Author, g.Signer}
+	}
 }
 
 func (void *Void) Validate(v ActionValidator) bool {
