@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/lienkolabs/ami/social/state"
+	"github.com/lienkolabs/axeprotocol/social/state"
 	"github.com/lienkolabs/breeze/crypto"
 	"github.com/lienkolabs/breeze/network"
 	"github.com/lienkolabs/breeze/network/echo"

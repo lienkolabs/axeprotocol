@@ -1,7 +1,7 @@
 package state
 
 import (
-	"github.com/lienkolabs/ami/social/actions"
+	"github.com/lienkolabs/axeprotocol/social/actions"
 	"github.com/lienkolabs/breeze/crypto"
 	"github.com/lienkolabs/breeze/protocol/chain"
 )

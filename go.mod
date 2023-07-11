@@ -1,4 +1,4 @@
-module github.com/lienkolabs/ami
+module github.com/lienkolabs/axeprotocol
 
 go 1.20
 
